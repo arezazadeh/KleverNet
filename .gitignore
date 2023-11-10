@@ -1,0 +1,5 @@
+/static
+/media
+/app
+/nginx_log
+.DS_Store
