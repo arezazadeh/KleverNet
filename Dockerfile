@@ -19,6 +19,8 @@ RUN pip install -r requirements.txt
 WORKDIR /opt/app
 COPY . /opt/app
 
+VOLUME /opt/app/media
+VOLUME /opt/app/static
 
 
 COPY ./entrypoint.sh /

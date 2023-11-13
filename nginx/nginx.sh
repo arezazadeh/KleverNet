@@ -1,8 +1,6 @@
 #!/bin/bash
 
 
+chmod -R 777 /opt/app/media
 
-mkdir -p /etc/nginx/sites-enabled
-mkdir -p /etc/nginx/sites-available
-
-ln -s /etc/nginx/conf.d/default.conf /etc/nginx/sites-enabled/default.conf
+exec "$@"

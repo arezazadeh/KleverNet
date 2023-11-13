@@ -3,9 +3,6 @@ version: "3.8"
 services:
   gunicorn:
     container_name: gunicorn
-    volumes:
-      - ./media:/media
-      - ./static:/static
     image: ahmadhr/klevernet:klevernet
     ports:
       - "8000:8000"
@@ -16,6 +13,10 @@ services:
     depends_on:
       - db
     restart: always
+    volumes:
+      - shared-static:/opt/app/static/
+      - shared-media:/opt/app/media/
+    
 
   redis:
     image: "redis:alpine"
@@ -31,10 +32,10 @@ services:
       - "80:80"
     depends_on:
       - gunicorn
+      
     volumes:
-      - ./static:/static
-      - ./media:/media
-      - nginx_log:/var/log/nginx
+      - shared-static:/opt/app/static/
+      - shared-media:/opt/app/media/
 
 
   celery:
@@ -52,8 +53,8 @@ services:
       - POSTGRES_PASSWORD=pgpass
       - POSTGRES_PORT=5432
 
-volumes:
-  media:
-  static:
-  nginx_log:
 
+
+volumes:
+  shared-static:
+  shared-media:
