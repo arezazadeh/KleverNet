@@ -2,30 +2,27 @@ version: "3.8"
 
 services:
   gunicorn:
-    image: ahmadhr/netsmart:klevernet
+    container_name: gunicorn
+    volumes:
+      - ./media:/media
+      - ./static:/static
+    image: ahmadhr/klevernet:klevernet
     ports:
       - "8000:8000"
+    command: python manage.py runserver 0.0.0.0:8000
     environment:
-      - CELERY_BACKEND='redis://redis:6379/3'
-      - CELERY_BROKER_URL='redis://redis:6379/4'
-      - CELERY_RESULT_BACKEND='redis://redis:6379/5'
+      - CELERY_BACKEND=redis://redis:6379
+      - CELERY_BROKER_URL=redis://redis:6379
     depends_on:
       - db
-      - redis
-    volumes:
-      - ./static:/static
-      - ./media:/media
     restart: always
-    command: python manage.py runserver 0.0.0.0:8000 --insecure
 
-  db:
-    image: postgres
-    container_name: pgdb
-    environment:
-      - POSTGRES_DB=postgres_db
-      - POSTGRES_USER=pguser
-      - POSTGRES_PASSWORD=pgpass
-      - POSTGRES_PORT=5432
+  redis:
+    image: "redis:alpine"
+    restart: always
+    ports:
+      - '6379:6379'
+
 
   nginx:
     build: ./nginx
@@ -37,33 +34,26 @@ services:
     volumes:
       - ./static:/static
       - ./media:/media
-      - ./nginx_log:/var/log/nginx
+      - nginx_log:/var/log/nginx
 
 
   celery:
-    build: .
-    image: celery
-    command:
-      - celery worker --app=core --loglevel=info
-    depends_on:
-      - redis
-    volumes:
-      - ./app:/app
-
-  celery-beat:
-    build: .
-    image: celery
-    command: celery -A core beat -l info
+    image: ahmadhr/klevernet:klevernet    
+    command: celery -A engine worker -l INFO --loglevel=info
     depends_on:
       - redis
 
-
-  redis:
-    image: "redis:alpine"
-
+  db:
+    image: postgres
+    container_name: pgdb
+    environment:
+      - POSTGRES_DB=postgres_db
+      - POSTGRES_USER=pguser
+      - POSTGRES_PASSWORD=pgpass
+      - POSTGRES_PORT=5432
 
 volumes:
-  static:
   media:
+  static:
   nginx_log:
 
