@@ -3,7 +3,7 @@ version: "3.8"
 services:
   gunicorn:
     container_name: gunicorn
-    image: ahmadhr/klevernet:klevernet
+    image: ahmadhr/klevernet:klevernet_2.0
     ports:
       - "8000:8000"
     command: python manage.py runserver 0.0.0.0:8000
@@ -39,7 +39,7 @@ services:
 
 
   celery:
-    image: ahmadhr/klevernet:klevernet    
+    image: ahmadhr/klevernet:klevernet_2.0
     command: celery -A engine worker -l INFO --loglevel=info
     depends_on:
       - redis
